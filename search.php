@@ -3,7 +3,10 @@
 	<button id='find' type='submit'>
 </form>
 <?php
-// Powered by ProcessWire!
+/* 
+@author: Timo Anttila <info@tuspe.com>
+Powered by ProcessWire!
+*/
 $q = $sanitizer->text($input->get->q);
 $item = explode(" ", $q);
 $i=0;
@@ -13,7 +16,7 @@ foreach($item as $item){
 	$select .= "title|body|body_hero|body_list%=$item";
 	$i++;
 }
-echo "<section id='info'><div class='container'><h1>Haku</h1>";
+echo "<div id='info'><div class='container'><h1>Haku</h1>";
 $item = $pages->findMany($select);
 if($item->first->id){
 	$content .= "<p>Haku löysi $item->count tulosta haulle: \"$q\".</p>";
