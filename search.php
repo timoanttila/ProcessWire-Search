@@ -1,109 +1,24 @@
+<form action='/search' method='get'>
+	<input name='q' type='search' placeholder='Keywords..'/>
+	<button id='find' type='submit'>
+</form>
 <?php
-/* These lines have to be loaded before any html. */
-
-if($input->get->lang){
-    $lang = $input->get->lang;
-    $input->whitelist('lang', $lang);
+// Powered by ProcessWire!
+$q = $sanitizer->text($input->get->q);
+$item = explode(" ", $q);
+$i=0;
+$select = "";
+foreach($item as $item){
+	if($i>0) $select .= ", ";
+	$select .= "title|body|body_hero|body_list%=$item";
+	$i++;
 }
-else if($user->lang){ $input->whitelist('lang', $user->lang); }
-
-if($input->get->blog){
-    $input->whitelist('blog', $input->get->blog);
+echo "<section id='info'><div class='container'><h1>Haku</h1>";
+$item = $pages->findMany($select);
+if($item->first->id){
+	$content .= "<p>Haku löysi $item->count tulosta haulle: \"$q\".</p>";
+	foreach($item as $item) echo "<div class='result'><h2>". $item->get("headline|title") ."</h2><p>". summary($item) ."</p><p><a class='nappi bgb' href='$item->url'>Lue lisää</a></p></div>";
+} else {
+	echo "<p>No results.</p>";
 }
-else if($session->blog){ $blog = $session->blog; }
-
-if($input->get->country){
-    $input->whitelist('country', $input->get->country);
-    $session->country = $input->get->country;
-}
-if($input->get->cat){
-    $input->whitelist('cat', $input->get->cat);
-    $session->cat = $input->get->cat;
-}
-?>
-
-<?php
-/* This part of code handles the search from searchform.php */
-
-$selector = '';
-
-// we use this to store the info that generates the summary of what was searched for
-$summary = array(
-	"blog" => $input->get->blog, 
-	"lang" => $input->get->lang,
-	"country" => $input->get->country, 
-	"cat" => $input->get->cat, 
-	"keys" => $input->get->keys, 
-);
-
-// if a blog is specified, then we limit the results to having that blog as their parent
-if($input->get->blog AND $input->get->blog) {
-	$blogin = $pages->get("/blog/" . $sanitizer->pageName($input->get->blog));
-	if($blogin->id) {
-        $selector .= "parent=$blogin->id, ";
-    }
-}
-
-if($input->get->lang) {
-    $item = $input->get->lang;
-    $item = $pages->get("/lang/" . $sanitizer->pageName($item));
-    if($item->id){
-        $selector .= ", lang=$item->id";
-    }
-}
-
-if($input->get->country){
-    $item = $input->get->country;
-    $item = $pages->get("/country/" . $sanitizer->pageName($item));
-    if($item->id){
-        $selector .= "country=$item->id, ";
-    }
-}
-
-if($input->get->cat){
-    $item = $input->get->cat;
-    $item = $pages->get("/c/" . $sanitizer->pageName($item));
-    if($item->id){
-        $selector .= "cat=$item->id";
-    }
-}
-
-if($input->get->keys){
-    $item = strip_tags($input->get->keys);
-    $selector .= "title|body|sum~=$item, ";
-}
-
-$selector .= "sort=title";
-
-echo "<h1>Search results</h1>";
-
-$search_blog = $selector .", template=blog";
-$blog = $pages->find($search_blog);
-
-$search_article = $selector .", template=article";
-$article = $pages->find($search_article);
-
-if(!$input->get->blog AND count($blog)>0){
-    $ifblog = TRUE;
-    echo "<h2>$blog->count matches from blogs.</h2>";
-    foreach($blog as $item){
-        $cat = $item->cat;
-        include('_list_blog.php');
-        $i++;
-    }
-}
-
-if(count($article)>0){
-    $ifblog = FALSE;
-    if($input->get->blog){
-        echo "<h2>Found $article->count matches from blog $blogin->title.</h2>";
-    } else {
-        echo "<h2>Found $article->count matches from articles.</h2>";
-    }
-    foreach($article as $item){
-        $cat = $item->parent->cat;
-        include('_list_blog.php');
-        $i++;
-    }
-}
-?>
+echo "</div></div>";
