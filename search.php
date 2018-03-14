@@ -7,6 +7,14 @@
 @author: Timo Anttila <info@tuspe.com>
 Powered by ProcessWire!
 */
+function summary($item){
+	if($item->sum) $sum = $item->sum;
+	else if(isset($item->body)){
+		preg_match('/^([^.!?]*[\.!?]+){0,2}/', strip_tags($item->body), $abstract);
+		$sum = $abstract[0];
+	}
+	return $sum;
+}
 $q = $sanitizer->text($input->get->q);
 $item = explode(" ", $q);
 $i=0;
