@@ -24,11 +24,11 @@ foreach($item as $item){
 	$select .= "title|body|body_hero|body_list%=$item";
 	$i++;
 }
-echo "<div id=\"info\"><div class=\"container\"><h1>Haku</h1>";
+echo "<div id='info'><div class='container'><h1>Haku</h1>";
 $item = $pages->findMany($select);
 if($item->first->id){
-	$content .= "<p>Haku löysi $item->count tulosta haulle: \"$q\".</p>";
-	foreach($item as $item) echo "<div class=\"result\"><h2>". $item->get("headline|title") ."</h2><p>". summary($item) ."</p><p><a class=\"nappi bgb\" href=\"$item->url\">Read more</a></p></div>";
+	$content .= "<p>Haku löysi $item->count tulosta haulle: '$q'.</p>";
+	foreach($item as $item) echo "<div class='result'><h2>". $item->get("headline|title") ."</h2><p>". summary($item) ."</p><p><a class='nappi bgb' href='$item->url'>Read more</a></p></div>";
 } else {
 	echo "<p>No results.</p>";
 }
